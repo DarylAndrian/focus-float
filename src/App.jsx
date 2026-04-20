@@ -1,23 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import useTimer from './hooks/useTimer';
-import TimerRing from './components/TimerRing';
-import FatigueBar from './components/FatigueBar';
-import CycleDots from './components/CycleDots';
-import StatsRow from './components/StatsRow';
 import SettingsPanel from './components/SettingsPanel';
 
 export default function App() {
   const timer = useTimer();
-  const [showSettings, setShowSettings] = React.useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('focusfloat-theme') || 'light');
 
-  // Request notification permission on load
+  // Apply theme
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('focusfloat-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
+
+  // Request notification permission
   useEffect(() => {
     if (Notification.permission === 'default') {
       Notification.requestPermission();
     }
   }, []);
 
-  // Update tab title with countdown
+  // Tab title countdown
   useEffect(() => {
     document.title = `${timer.timeDisplay} — ${timer.config.label} | FocusFloat`;
   }, [timer.timeDisplay, timer.config.label]);
@@ -28,54 +33,85 @@ export default function App() {
 
   return (
     <div id="app">
-      {/* Title Bar */}
-      <div className="title-bar">
-        <h1>FocusFloat</h1>
-        <div className="controls">
-          <button onClick={() => setShowSettings(true)} title="Settings">⚙️</button>
+      {/* Top Bar */}
+      <div className="top-bar">
+        <span className="logo">FocusFloat</span>
+        <div className="actions">
+          <button className="icon-btn" onClick={toggleTheme} title="Toggle theme">
+            <i className={`fa-solid ${theme === 'light' ? 'fa-moon' : 'fa-sun'}`}></i>
+          </button>
+          <button className="icon-btn" onClick={() => setShowSettings(true)} title="Settings">
+            <i className="fa-solid fa-sliders"></i>
+          </button>
         </div>
       </div>
 
       {/* Phase */}
-      <div className="phase-section">
-        <div className="phase-label" style={{ color: timer.config.color }}>
-          <i className={timer.config.icon} style={{ marginRight: 10 }}></i>
+      <div className="phase">
+        <div className="phase-name">
+          <i className={timer.config.icon} style={{ marginRight: 6 }}></i>
           {timer.config.label}
         </div>
-        <div className="phase-sublabel">{timer.config.sublabel}</div>
+        <div className="phase-time">{timer.timeDisplay}</div>
       </div>
 
-      {/* Timer */}
-      <TimerRing progress={timer.progress} color={timer.config.color}>
-        {timer.timeDisplay}
-      </TimerRing>
+      {/* Progress Bar */}
+      <div className="progress-track">
+        <div className="progress-fill" style={{ width: `${timer.progress * 100}%` }}></div>
+      </div>
 
-      {/* Controls */}
-      <div className="controls-section">
+      {/* Actions */}
+      <div className="actions-main">
         <button className="btn btn-primary" onClick={timer.toggle}>
-          {timer.isRunning ? '⏸ Pause' : '▶ Start'}
+          {timer.isRunning ? 'Pause' : 'Start'}
         </button>
-        <button className="btn btn-secondary" onClick={timer.skip}>⏭ Skip</button>
+        <button className="btn btn-secondary" onClick={timer.skip}>
+          Skip
+        </button>
       </div>
 
       {/* Fatigue */}
-      <FatigueBar fatigue={timer.fatigue} threshold={timer.settings.fatigueThreshold} percent={timer.fatiguePercent} />
+      <div className="fatigue-wrap">
+        <div className="section-label">Fatigue</div>
+        <div className="fatigue-track">
+          <div className="fatigue-fill" style={{ width: `${timer.fatiguePercent}%` }}></div>
+        </div>
+      </div>
 
       {/* Stats */}
-      <StatsRow
-        work={timer.sessions.work}
-        ai={timer.sessions.ai}
-        longBreaks={timer.sessions.longBreaks}
-        totalHours={hours}
-        totalMins={mins}
-      />
+      <div className="stats">
+        <div className="stat">
+          <span className="stat-num">{timer.sessions.work}</span>
+          <span className="stat-text">Work</span>
+        </div>
+        <div className="stat">
+          <span className="stat-num">{timer.sessions.ai}</span>
+          <span className="stat-text">AI</span>
+        </div>
+        <div className="stat">
+          <span className="stat-num">{timer.sessions.longBreaks}</span>
+          <span className="stat-text">Resets</span>
+        </div>
+        <div className="stat">
+          <span className="stat-num">{hours > 0 ? `${hours}h${mins > 0 ? mins + 'm' : ''}` : `${mins}m`}</span>
+          <span className="stat-text">Total</span>
+        </div>
+      </div>
 
-      {/* Cycle Dots */}
-      <CycleDots
-        cycleOrder={timer.cycleOrder}
-        currentIndex={timer.phaseIndex}
-        phase={timer.phase}
-      />
+      {/* Cycle */}
+      <div className="cycle-wrap">
+        <div className="section-label">Cycle</div>
+        <div className="cycle-steps">
+          {timer.cycleOrder.map((p, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <span className="cycle-arrow"><i className="fa-solid fa-chevron-right"></i></span>}
+              <div className={`cycle-step ${p === 'rest' ? 'rest-step' : ''} ${i === timer.phaseIndex && timer.phase !== 'long_break' ? 'active' : ''} ${i < timer.phaseIndex ? 'done' : ''}`}>
+                <i className={p === 'work' ? 'fa-solid fa-fire' : p === 'rest' ? 'fa-solid fa-minus' : p === 'ai' ? 'fa-solid fa-robot' : 'fa-solid fa-moon'}></i>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
 
       {/* Settings */}
       {showSettings && (

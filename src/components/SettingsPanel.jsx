@@ -15,59 +15,45 @@ export default function SettingsPanel({ settings, onSave, onClose }) {
       longBreakDuration: Math.max(5, Math.min(60, form.longBreakDuration)),
       fatigueThreshold: Math.max(20, Math.min(200, form.fatigueThreshold)),
       soundEnabled: form.soundEnabled,
-      autoStartNext: form.autoStartNext,
     };
     onSave(clean);
     onClose();
   };
 
   return (
-    <div className="settings-panel open">
-      <div className="settings-header">
+    <div className="settings-overlay open">
+      <div className="settings-head">
         <h2><i className="fa-solid fa-sliders" style={{ marginRight: 8 }}></i>Settings</h2>
-        <button className="btn btn-secondary" onClick={onClose}>✕ Close</button>
+        <button className="icon-btn" onClick={onClose}><i className="fa-solid fa-xmark"></i></button>
       </div>
 
-      <div className="settings-grid">
-        <div className="setting-group">
-          <h3>⏱ Durations</h3>
-          <Row label="Work Duration">
-            <NumInput value={form.workDuration} onChange={v => update('workDuration', v)} /> <span className="unit">min</span>
-          </Row>
-          <Row label="AI Handling Duration">
-            <NumInput value={form.aiDuration} onChange={v => update('aiDuration', v)} /> <span className="unit">min</span>
-          </Row>
-          <Row label="Base Rest Duration">
-            <NumInput value={form.baseRestDuration} onChange={v => update('baseRestDuration', v)} /> <span className="unit">min</span>
-          </Row>
-          <Row label="Long Break Duration">
-            <NumInput value={form.longBreakDuration} onChange={v => update('longBreakDuration', v)} /> <span className="unit">min</span>
-          </Row>
-        </div>
-
-        <div className="setting-group">
-          <h3>🧠 Progressive Rest</h3>
-          <Row label="Rest Increment">
-            <NumInput value={form.restIncrement} onChange={v => update('restIncrement', v)} /> <span className="unit">min / cycle</span>
-          </Row>
-          <Row label="Max Rest Duration">
-            <NumInput value={form.maxRestDuration} onChange={v => update('maxRestDuration', v)} /> <span className="unit">min</span>
-          </Row>
-          <Row label="Fatigue Threshold">
-            <NumInput value={form.fatigueThreshold} onChange={v => update('fatigueThreshold', v)} /> <span className="unit">pts</span>
-          </Row>
-        </div>
-
-        <div className="setting-group">
-          <h3>🔊 Preferences</h3>
-          <Row label="Sound Notifications">
-            <Toggle checked={form.soundEnabled} onChange={v => update('soundEnabled', v)} />
-          </Row>
-        </div>
+      <div className="settings-group">
+        <h3>Durations</h3>
+        <Row label="Work"><NumInput value={form.workDuration} onChange={v => update('workDuration', v)} unit="min" /></Row>
+        <Row label="AI Handling"><NumInput value={form.aiDuration} onChange={v => update('aiDuration', v)} unit="min" /></Row>
+        <Row label="Base Rest"><NumInput value={form.baseRestDuration} onChange={v => update('baseRestDuration', v)} unit="min" /></Row>
+        <Row label="Long Break"><NumInput value={form.longBreakDuration} onChange={v => update('longBreakDuration', v)} unit="min" /></Row>
       </div>
 
-      <button className="btn btn-primary save-btn" onClick={handleSave}>
-        <i className="fa-solid fa-floppy-disk" style={{ marginRight: 8 }}></i>Save & Close
+      <div className="settings-group">
+        <h3>Progressive Rest</h3>
+        <Row label="Rest Increment"><NumInput value={form.restIncrement} onChange={v => update('restIncrement', v)} unit="min / cycle" /></Row>
+        <Row label="Max Rest"><NumInput value={form.maxRestDuration} onChange={v => update('maxRestDuration', v)} unit="min" /></Row>
+        <Row label="Fatigue Threshold"><NumInput value={form.fatigueThreshold} onChange={v => update('fatigueThreshold', v)} unit="pts" /></Row>
+      </div>
+
+      <div className="settings-group">
+        <h3>Preferences</h3>
+        <Row label="Sound">
+          <label className="toggle">
+            <input type="checkbox" checked={form.soundEnabled} onChange={e => update('soundEnabled', e.target.checked)} />
+            <span className="toggle-track"></span>
+          </label>
+        </Row>
+      </div>
+
+      <button className="save-btn" onClick={handleSave}>
+        <i className="fa-solid fa-check" style={{ marginRight: 6 }}></i>Save
       </button>
     </div>
   );
@@ -75,29 +61,18 @@ export default function SettingsPanel({ settings, onSave, onClose }) {
 
 function Row({ label, children }) {
   return (
-    <div className="setting-row">
+    <div className="setting-item">
       <label>{label}</label>
       <div>{children}</div>
     </div>
   );
 }
 
-function NumInput({ value, onChange }) {
+function NumInput({ value, onChange, unit }) {
   return (
-    <input
-      type="number"
-      value={value}
-      onChange={e => onChange(parseInt(e.target.value) || 0)}
-      min="1"
-    />
-  );
-}
-
-function Toggle({ checked, onChange }) {
-  return (
-    <label className="toggle">
-      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} />
-      <span className="toggle-slider"></span>
-    </label>
+    <span style={{ display: 'flex', alignItems: 'center' }}>
+      <input type="number" value={value} onChange={e => onChange(parseInt(e.target.value) || 0)} min="1" />
+      {unit && <span className="setting-unit">{unit}</span>}
+    </span>
   );
 }
