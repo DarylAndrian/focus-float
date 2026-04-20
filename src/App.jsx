@@ -30,7 +30,7 @@ export default function App() {
     <div id="app">
       {/* Title Bar */}
       <div className="title-bar">
-        <h1>🍅 FocusFloat</h1>
+        <h1>FocusFloat</h1>
         <div className="controls">
           <button onClick={() => setShowSettings(true)} title="Settings">⚙️</button>
         </div>
@@ -39,6 +39,7 @@ export default function App() {
       {/* Phase */}
       <div className="phase-section">
         <div className="phase-label" style={{ color: timer.config.color }}>
+          <i className={timer.config.icon} style={{ marginRight: 10 }}></i>
           {timer.config.label}
         </div>
         <div className="phase-sublabel">{timer.config.sublabel}</div>

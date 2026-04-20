@@ -3,10 +3,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 const PHASES = ['work', 'rest', 'work', 'rest', 'ai', 'rest'];
 
 const PHASE_CONFIG = {
-  work: { label: '🍅 Work', color: '#e94560', sublabel: 'Deep focus time' },
-  rest: { label: '☕ Rest', color: '#0f3460', sublabel: 'Recover and recharge' },
-  ai: { label: '🤖 AI Handling', color: '#16a085', sublabel: 'Semi-work: prompts & reviews' },
-  long_break: { label: '😴 Long Break', color: '#8e44ad', sublabel: 'Full reset — you earned it' },
+  work: { label: 'Work', icon: 'fa-solid fa-fire', color: '#ef4444', sublabel: 'Deep focus time' },
+  rest: { label: 'Rest', icon: 'fa-solid fa-mug-hot', color: '#a3763d', sublabel: 'Recover and recharge' },
+  ai: { label: 'AI Handling', icon: 'fa-solid fa-robot', color: '#2dd4bf', sublabel: 'Semi-work: prompts & reviews' },
+  long_break: { label: 'Long Break', icon: 'fa-solid fa-moon', color: '#a78bfa', sublabel: 'Full reset — you earned it' },
 };
 
 const DEFAULT_SETTINGS = {
@@ -98,7 +98,7 @@ export default function useTimer() {
         setPhaseElapsed(0);
         setSessions(s => ({ ...s, longBreaks: s.longBreaks + 1 }));
         playSound('long_break', settings.soundEnabled);
-        notify('😴 Long break — press Start when ready!');
+        notify('Long break — press Start when ready!');
         return;
       }
 
@@ -110,7 +110,7 @@ export default function useTimer() {
         setPhase('work');
         setPhaseElapsed(0);
         playSound('work', settings.soundEnabled);
-        notify('🍅 Fresh start — press Start!');
+        notify('Fresh start — press Start!');
         return;
       }
 
@@ -126,7 +126,7 @@ export default function useTimer() {
       setPhase(nextPhase);
       setPhaseElapsed(0);
 
-      const labels = { work: '🍅 Time to focus!', rest: '☕ Rest time!', ai: '🤖 AI handling!' };
+      const labels = { work: 'Time to focus!', rest: 'Rest time!', ai: 'AI handling!' };
       playSound(nextPhase, settings.soundEnabled);
       notify(labels[nextPhase] + ' Press Start to begin.');
     }
