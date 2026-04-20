@@ -30,7 +30,7 @@ function loadSettings() {
   }
 }
 
-function saveSettings(settings) {
+function saveSettingsToStorage(settings) {
   localStorage.setItem('focusfloat-settings', JSON.stringify(settings));
 }
 
@@ -58,8 +58,6 @@ export default function useTimer() {
   const progress = phaseDuration > 0 ? phaseElapsed / phaseDuration : 0;
   const fatiguePercent = Math.min(100, (fatigue / settings.fatigueThreshold) * 100);
 
-  const progressiveRest = getProgressiveRest(settings, cycleCount);
-
   // Timer tick
   useEffect(() => {
     if (isRunning) {
@@ -75,71 +73,64 @@ export default function useTimer() {
   // Phase complete check
   useEffect(() => {
     if (phaseElapsed >= phaseDuration && isRunning) {
-      completePhase();
+      // Stop timer
+      setIsRunning(false);
+
+      const completedPhase = phase;
+
+      // Track fatigue
+      if (completedPhase === 'work') {
+        setFatigue(f => f + settings.workDuration);
+        setSessions(s => ({ ...s, work: s.work + 1 }));
+        setTotalWorkMin(t => t + settings.workDuration);
+      } else if (completedPhase === 'ai') {
+        setFatigue(f => f + settings.aiDuration * 0.5);
+        setSessions(s => ({ ...s, ai: s.ai + 1 }));
+        setTotalAiMin(t => t + settings.aiDuration);
+      }
+
+      // Determine next phase
+      const currentFatigue = fatigue + (completedPhase === 'work' ? settings.workDuration : completedPhase === 'ai' ? settings.aiDuration * 0.5 : 0);
+
+      // Check for long break
+      if (currentFatigue >= settings.fatigueThreshold && completedPhase !== 'long_break') {
+        setPhase('long_break');
+        setPhaseElapsed(0);
+        setSessions(s => ({ ...s, longBreaks: s.longBreaks + 1 }));
+        playSound('long_break', settings.soundEnabled);
+        notify('😴 Long break — press Start when ready!');
+        return;
+      }
+
+      // After long break, reset
+      if (completedPhase === 'long_break') {
+        setFatigue(0);
+        setCycleCount(0);
+        setPhaseIndex(0);
+        setPhase('work');
+        setPhaseElapsed(0);
+        playSound('work', settings.soundEnabled);
+        notify('🍅 Fresh start — press Start!');
+        return;
+      }
+
+      // Normal cycle progression
+      const nextIndex = (phaseIndex + 1) % PHASES.length;
+      const nextPhase = PHASES[nextIndex];
+
+      if (nextIndex === 0) {
+        setCycleCount(c => c + 1);
+      }
+
+      setPhaseIndex(nextIndex);
+      setPhase(nextPhase);
+      setPhaseElapsed(0);
+
+      const labels = { work: '🍅 Time to focus!', rest: '☕ Rest time!', ai: '🤖 AI handling!' };
+      playSound(nextPhase, settings.soundEnabled);
+      notify(labels[nextPhase] + ' Press Start to begin.');
     }
   }, [phaseElapsed, phaseDuration, isRunning]);
-
-  function completePhase() {
-    const completedPhase = phase;
-    let newFatigue = fatigue;
-    let newSessions = { ...sessions };
-    let newTotalWork = totalWorkMin;
-    let newTotalAi = totalAiMin;
-
-    // Track fatigue
-    if (completedPhase === 'work') {
-      newFatigue = fatigue + settings.workDuration;
-      newSessions.work += 1;
-      newTotalWork += settings.workDuration;
-    } else if (completedPhase === 'ai') {
-      newFatigue = fatigue + settings.aiDuration * 0.5;
-      newSessions.ai += 1;
-      newTotalAi += settings.aiDuration;
-    }
-
-    setFatigue(newFatigue);
-    setSessions(newSessions);
-    setTotalWorkMin(newTotalWork);
-    setTotalAiMin(newTotalAi);
-
-    // Check for long break
-    if (newFatigue >= settings.fatigueThreshold && completedPhase !== 'long_break') {
-      setPhase('long_break');
-      setPhaseElapsed(0);
-      newSessions.longBreaks += 1;
-      setSessions(newSessions);
-      playSound('long_break');
-      notify('😴 Long break — recharge!');
-      return;
-    }
-
-    // After long break, reset
-    if (completedPhase === 'long_break') {
-      setFatigue(0);
-      setCycleCount(0);
-      setPhaseIndex(0);
-      setPhase('work');
-      setPhaseElapsed(0);
-      playSound('work');
-      notify('🍅 Time to focus!');
-      return;
-    }
-
-    // Normal cycle progression
-    const nextIndex = (phaseIndex + 1) % PHASES.length;
-    const nextPhase = PHASES[nextIndex];
-
-    if (nextIndex === 0) {
-      setCycleCount(c => c + 1);
-    }
-
-    setPhaseIndex(nextIndex);
-    setPhase(nextPhase);
-    setPhaseElapsed(0);
-
-    playSound(nextPhase);
-    notify(PHASE_CONFIG[nextPhase].label + '!');
-  }
 
   const toggle = useCallback(() => setIsRunning(r => !r), []);
 
@@ -161,7 +152,7 @@ export default function useTimer() {
 
   const updateSettings = useCallback((newSettings) => {
     setSettings(newSettings);
-    saveSettings(newSettings);
+    saveSettingsToStorage(newSettings);
   }, []);
 
   return {
@@ -182,7 +173,6 @@ export default function useTimer() {
     reset,
     settings,
     updateSettings,
-    progressiveRest,
     cycleOrder: PHASES,
   };
 }
@@ -207,7 +197,8 @@ function getProgressiveRest(settings, cycleCount) {
   return settings.baseRestDuration + increment;
 }
 
-function playSound(phase) {
+function playSound(phase, enabled) {
+  if (!enabled) return;
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
