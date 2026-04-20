@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import useTimer from './hooks/useTimer';
 import TimerRing from './components/TimerRing';
 import FatigueBar from './components/FatigueBar';
@@ -8,9 +8,7 @@ import SettingsPanel from './components/SettingsPanel';
 
 export default function App() {
   const timer = useTimer();
-  const [showSettings, setShowSettings] = useState(false);
-  const [pipActive, setPipActive] = useState(false);
-  const pipDocRef = useRef(null);
+  const [showSettings, setShowSettings] = React.useState(false);
 
   // Request notification permission on load
   useEffect(() => {
@@ -19,91 +17,10 @@ export default function App() {
     }
   }, []);
 
-  // PiP via Document Picture-in-Picture API
-  const togglePip = async () => {
-    if (pipDocRef.current) {
-      // Close existing PiP
-      try { await pipDocRef.current.close(); } catch {}
-      pipDocRef.current = null;
-      setPipActive(false);
-      return;
-    }
-
-    if (!('documentPictureInPicture' in window)) {
-      alert('Your browser does not support Document PiP. Try Chrome or Edge.');
-      return;
-    }
-
-    try {
-      const pipWindow = await window.documentPictureInPicture.requestWindow({
-        width: 220,
-        height: 200,
-      });
-      pipDocRef.current = pipWindow;
-
-      // Copy styles
-      const style = document.createElement('style');
-      style.textContent = `
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-          background: rgba(26, 26, 46, 0.92);
-          backdrop-filter: blur(20px);
-          color: #eaeaea;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          overflow: hidden;
-          user-select: none;
-        }
-        .pip-phase { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-        .pip-time { font-size: 34px; font-weight: 200; font-variant-numeric: tabular-nums; letter-spacing: 2px; margin-bottom: 8px; }
-        .pip-bar { width: 120px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
-        .pip-fill { height: 100%; border-radius: 2px; transition: width 1s linear; }
-        .pip-controls { display: flex; gap: 10px; }
-        .pip-btn { width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; font-size: 14px; }
-        .pip-btn-play { background: #e94560; color: white; }
-        .pip-fatigue { font-size: 10px; color: #a0a0b0; margin-top: 6px; }
-      `;
-      pipWindow.document.head.appendChild(style);
-
-      // Handle close
-      pipWindow.addEventListener('pagehide', () => {
-        pipDocRef.current = null;
-        setPipActive(false);
-      });
-
-      setPipActive(true);
-    } catch (e) {
-      console.error('PiP failed:', e);
-    }
-  };
-
-  // Update PiP content
+  // Update tab title with countdown
   useEffect(() => {
-    if (!pipDocRef.current) return;
-    const doc = pipDocRef.current.document;
-    doc.body.innerHTML = `
-      <div class="pip-phase" style="color: ${timer.config.color}">${timer.config.label}</div>
-      <div class="pip-time">${timer.timeDisplay}</div>
-      <div class="pip-bar">
-        <div class="pip-fill" style="width: ${timer.progress * 100}%; background: ${timer.config.color}"></div>
-      </div>
-      <div class="pip-controls">
-        <button class="pip-btn pip-btn-play" onclick="window.__pipToggle()">
-          ${timer.isRunning ? '⏸' : '▶'}
-        </button>
-      </div>
-      <div class="pip-fatigue">Fatigue: ${Math.round(timer.fatigue)}/${timer.settings.fatigueThreshold}</div>
-    `;
-  }, [timer.timeDisplay, timer.progress, timer.isRunning, timer.config, timer.fatigue, timer.settings.fatigueThreshold, pipActive]);
-
-  // Expose toggle to PiP button
-  useEffect(() => {
-    window.__pipToggle = timer.toggle;
-  }, [timer.toggle]);
+    document.title = `${timer.timeDisplay} — ${timer.config.label} | FocusFloat`;
+  }, [timer.timeDisplay, timer.config.label]);
 
   const total = timer.totalWorkMin + timer.totalAiMin;
   const hours = Math.floor(total / 60);
@@ -138,9 +55,6 @@ export default function App() {
           {timer.isRunning ? '⏸ Pause' : '▶ Start'}
         </button>
         <button className="btn btn-secondary" onClick={timer.skip}>⏭ Skip</button>
-        <button className="btn btn-pip" onClick={togglePip}>
-          {pipActive ? '🔻 Dock' : '🔲 Float'}
-        </button>
       </div>
 
       {/* Fatigue */}
