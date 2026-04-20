@@ -47,15 +47,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-  "cli": null,
-  "updater": {
-    "active": false
-  },
-  "allowlist": {
-    "all": false,
-    "shell": {
-      "all": false
-    }
   }
 }
