@@ -1,5 +1,4 @@
 /* ─── FocusFloat Styles ─────────────────────────────────────── */
-/* Enhanced Pomodoro Timer with Floating PiP */
 
 :root {
   --bg-primary: #1a1a2e;
@@ -16,21 +15,17 @@
   --transition: all 0.3s ease;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow: hidden;
   user-select: none;
 }
 
-/* ─── Full Window Layout ────────────────────────────────────── */
+/* ─── Main Window ───────────────────────────────────────────── */
 #app {
   display: flex;
   flex-direction: column;
@@ -38,13 +33,20 @@ body {
   padding: 24px;
 }
 
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: var(--text-secondary);
+}
+
 /* ─── Title Bar ─────────────────────────────────────────────── */
 .title-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  -webkit-app-region: drag;
+  margin-bottom: 16px;
 }
 
 .title-bar h1 {
@@ -56,7 +58,6 @@ body {
 .title-bar .controls {
   display: flex;
   gap: 8px;
-  -webkit-app-region: no-drag;
 }
 
 .title-bar button {
@@ -75,57 +76,43 @@ body {
   color: var(--text-primary);
 }
 
-/* ─── Phase Indicator ───────────────────────────────────────── */
+/* ─── Phase ─────────────────────────────────────────────────── */
 .phase-section {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 
 .phase-label {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  margin-bottom: 4px;
   transition: var(--transition);
 }
 
 .phase-sublabel {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
+  margin-top: 2px;
 }
 
-/* ─── Circular Timer ────────────────────────────────────────── */
-.timer-circle-wrapper {
+/* ─── Timer Ring ────────────────────────────────────────────── */
+.timer-ring-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
-  margin: 16px 0;
+  margin: 8px 0;
 }
 
-.timer-circle {
+.timer-ring {
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: 200px;
+  height: 200px;
 }
 
-.timer-circle svg {
-  transform: rotate(-90deg);
-  width: 220px;
-  height: 220px;
+.timer-ring svg {
+  width: 200px;
+  height: 200px;
 }
 
-.timer-circle .bg-ring {
-  fill: none;
-  stroke: rgba(255,255,255,0.05);
-  stroke-width: 8;
-}
-
-.timer-circle .progress-ring {
-  fill: none;
-  stroke: var(--accent-red);
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-dasharray: 628;
-  stroke-dashoffset: 628;
+.progress-ring {
   transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
 }
 
@@ -134,7 +121,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 48px;
+  font-size: 44px;
   font-weight: 200;
   font-variant-numeric: tabular-nums;
   letter-spacing: 2px;
@@ -144,8 +131,8 @@ body {
 .controls-section {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  margin: 20px 0;
+  gap: 12px;
+  margin: 12px 0;
 }
 
 .btn {
@@ -154,7 +141,7 @@ body {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  padding: 12px 28px;
+  padding: 10px 24px;
   transition: var(--transition);
   outline: none;
 }
@@ -164,14 +151,8 @@ body {
   color: white;
 }
 
-.btn-primary:hover {
-  filter: brightness(1.1);
-  transform: scale(1.02);
-}
-
-.btn-primary.running {
-  background: #c0392b;
-}
+.btn-primary:hover { filter: brightness(1.1); transform: scale(1.02); }
+.btn-primary.running { background: #c0392b; }
 
 .btn-secondary {
   background: rgba(255,255,255,0.08);
@@ -188,14 +169,12 @@ body {
   color: white;
 }
 
-.btn-pip:hover {
-  filter: brightness(1.15);
-}
+.btn-pip:hover { filter: brightness(1.15); }
 
 /* ─── Fatigue Bar ───────────────────────────────────────────── */
 .fatigue-section {
-  margin: 16px 0;
-  padding: 12px 16px;
+  margin: 12px 0;
+  padding: 10px 14px;
   background: var(--bg-secondary);
   border-radius: var(--border-radius);
 }
@@ -203,8 +182,7 @@ body {
 .fatigue-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-size: 12px;
   color: var(--text-secondary);
 }
@@ -223,23 +201,23 @@ body {
   transition: width 0.5s ease;
 }
 
-/* ─── Stats Row ─────────────────────────────────────────────── */
+/* ─── Stats ─────────────────────────────────────────────────── */
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  margin: 16px 0;
+  margin: 12px 0;
 }
 
 .stat-card {
   background: var(--bg-secondary);
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px;
   text-align: center;
 }
 
 .stat-value {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   display: block;
 }
@@ -253,11 +231,11 @@ body {
   display: block;
 }
 
-/* ─── Cycle Progress ────────────────────────────────────────── */
+/* ─── Cycle Dots ────────────────────────────────────────────── */
 .cycle-section {
   background: var(--bg-secondary);
   border-radius: var(--border-radius);
-  padding: 14px 16px;
+  padding: 12px 14px;
   margin: 8px 0;
 }
 
@@ -271,6 +249,7 @@ body {
   display: flex;
   gap: 6px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .cycle-dot {
@@ -284,28 +263,23 @@ body {
   transition: var(--transition);
 }
 
-.cycle-dot.work {
-  background: rgba(233, 69, 96, 0.2);
-  border: 2px solid var(--accent-red);
-}
-
-.cycle-dot.rest {
-  background: rgba(15, 52, 96, 0.3);
-  border: 2px solid var(--accent-blue);
-}
-
-.cycle-dot.ai {
-  background: rgba(22, 160, 133, 0.2);
-  border: 2px solid var(--accent-teal);
-}
+.cycle-dot.work { background: rgba(233,69,96,0.2); border: 2px solid var(--accent-red); }
+.cycle-dot.rest { background: rgba(15,52,96,0.3); border: 2px solid var(--accent-blue); }
+.cycle-dot.ai { background: rgba(22,160,133,0.2); border: 2px solid var(--accent-teal); }
 
 .cycle-dot.active {
-  transform: scale(1.2);
+  transform: scale(1.25);
   box-shadow: 0 0 12px currentColor;
 }
 
-.cycle-dot.completed {
-  opacity: 0.5;
+.cycle-dot.completed { opacity: 0.5; }
+
+.long-break-dot {
+  background: rgba(142,68,173,0.2);
+  border: 2px solid var(--accent-purple);
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
 }
 
 .cycle-arrow {
@@ -327,54 +301,45 @@ body {
   overflow-y: auto;
 }
 
-.settings-panel.open {
-  display: block;
-}
+.settings-panel.open { display: block; }
 
 .settings-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-.settings-header h2 {
-  font-size: 20px;
-}
+.settings-header h2 { font-size: 20px; }
 
-.settings-grid {
-  display: grid;
-  gap: 16px;
-}
+.settings-grid { display: grid; gap: 14px; }
 
 .setting-group {
   background: var(--bg-secondary);
   border-radius: var(--border-radius);
-  padding: 16px;
+  padding: 14px;
 }
 
 .setting-group h3 {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .setting-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
-.setting-row label {
-  font-size: 14px;
-}
+.setting-row label { font-size: 14px; }
 
 .setting-row input[type="number"] {
   width: 70px;
-  padding: 6px 10px;
+  padding: 5px 8px;
   background: var(--bg-primary);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 6px;
@@ -388,32 +353,25 @@ body {
   border-color: var(--accent-red);
 }
 
-.setting-row .unit {
-  font-size: 12px;
+.unit {
+  font-size: 11px;
   color: var(--text-secondary);
-  margin-left: 6px;
+  margin-left: 4px;
 }
 
-/* Toggle switch */
+/* Toggle */
 .toggle {
   position: relative;
   width: 44px;
   height: 24px;
 }
 
-.toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+.toggle input { opacity: 0; width: 0; height: 0; }
 
 .toggle-slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(255,255,255,0.1);
   border-radius: 24px;
   transition: var(--transition);
@@ -431,26 +389,28 @@ body {
   transition: var(--transition);
 }
 
-.toggle input:checked + .toggle-slider {
-  background: var(--accent-red);
+.toggle input:checked + .toggle-slider { background: var(--accent-red); }
+.toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+.save-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  font-size: 16px;
 }
 
-.toggle input:checked + .toggle-slider:before {
-  transform: translateX(20px);
-}
-
-/* ─── PiP Window Styles ─────────────────────────────────────── */
-body.pip {
+/* ─── PiP Window ────────────────────────────────────────────── */
+body.pip-body {
   background: transparent;
   overflow: visible;
 }
 
-#pip-app {
+.pip-app {
   background: rgba(26, 26, 46, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
-  padding: 16px;
+  padding: 14px;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -460,22 +420,20 @@ body.pip {
   cursor: grab;
 }
 
-#pip-app:active {
-  cursor: grabbing;
-}
+.pip-app:active { cursor: grabbing; }
 
 .pip-phase {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .pip-time {
-  font-size: 36px;
+  font-size: 34px;
   font-weight: 200;
   font-variant-numeric: tabular-nums;
   letter-spacing: 2px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .pip-progress-bar {
@@ -484,12 +442,11 @@ body.pip {
   background: rgba(255,255,255,0.1);
   border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .pip-progress-fill {
   height: 100%;
-  background: var(--accent-red);
   border-radius: 2px;
   transition: width 1s linear;
 }
@@ -512,41 +469,17 @@ body.pip {
   transition: var(--transition);
 }
 
-.pip-btn-play {
-  background: var(--accent-red);
-  color: white;
-}
-
-.pip-btn-expand {
-  background: rgba(255,255,255,0.1);
-  color: var(--text-secondary);
-}
-
-.pip-btn:hover {
-  filter: brightness(1.2);
-  transform: scale(1.05);
-}
+.pip-btn-play { background: var(--accent-red); color: white; }
+.pip-btn-expand { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
+.pip-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
 
 .pip-fatigue-mini {
   font-size: 10px;
   color: var(--text-secondary);
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 /* ─── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.2);
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }

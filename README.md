@@ -1,17 +1,18 @@
 # 🍅 FocusFloat
 
-> Enhanced Pomodoro timer with floating Picture-in-Picture window
+> Enhanced Pomodoro timer with floating PiP window — built with Rust + React
 
 FocusFloat uses a smarter timeboxing model: **Work → Rest → Work → Rest → AI Handling → Rest** with progressive rest durations that increase as your fatigue accumulates. After a fatigue threshold is reached, a long break resets you for the next round.
 
 ## ✨ Features
 
+- 🦀 **Rust Backend** — Rock-solid timer engine, zero drift, ~8MB binary
+- ⚛️ **React Frontend** — Clean UI with smooth animations
 - 🔲 **Floating PiP Timer** — Always-on-top mini timer that stays visible over any app
-- 🍅 **Enhanced Pomodoro Cycle** — Work (25m) → Rest → Work (25m) → Rest → AI Handling (20m) → Rest
 - 🧠 **Progressive Rest** — Rest durations grow as fatigue accumulates
-- 🤖 **AI Handling Phase** — Dedicated semi-work phase for AI tasks (counts as 0.5x fatigue)
+- 🤖 **AI Handling Phase** — Dedicated semi-work phase (counts as 0.5x fatigue)
 - 😴 **Long Break Reset** — Automatic long break when fatigue threshold is reached
-- 🔔 **Smart Notifications** — Sound alerts and system notifications on phase changes
+- 🔔 **System Notifications** — Native OS notifications on phase changes
 - ⚙️ **Customizable Settings** — All durations and thresholds are tunable
 
 ## 🔄 Cycle Flow
@@ -32,14 +33,13 @@ When fatigue ≥ 60 points → [Long Break 25m] → fatigue reset → repeat
 | AI Handling (20m) | +10 (0.5x) |
 | Rest | Recovery |
 
-After ~2 full cycles (~83min × 2 ≈ 2h 46min), fatigue hits the threshold and triggers a **25-minute long break**.
-
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+
-- [npm](https://www.npmjs.com/)
+- [Rust](https://rustup.rs/) (for Tauri backend)
+- OS dependencies for Tauri: https://v2.tauri.app/start/prerequisites/
 
 ### Install & Run
 
@@ -48,55 +48,57 @@ After ~2 full cycles (~83min × 2 ≈ 2h 46min), fatigue hits the threshold and 
 git clone https://github.com/DarylAndrian/focus-float.git
 cd focus-float
 
-# Install dependencies
+# Install frontend deps
 npm install
 
-# Run the app
-npm start
+# Run in dev mode
+npm run tauri dev
 ```
 
-### Build for Your Platform
+### Build
 
 ```bash
-# macOS
-npm run build:mac
-
-# Windows
-npm run build:win
-
-# Linux
-npm run build:linux
+npm run tauri build
 ```
+
+Output binary: `src-tauri/target/release/bundle/`
 
 ## ⌨️ Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `⌘⇧F` / `Ctrl+Shift+F` | Toggle floating PiP window |
+| System tray | Show/Hide, Toggle PiP, Quit |
 
 ## 🛠 Tech Stack
 
-- **[Electron](https://www.electronjs.org/)** — Desktop app framework
-- **Vanilla JS** — No framework overhead, fast and light
-- **Web Audio API** — Beep sounds without external files
+- **[Tauri v2](https://v2.tauri.app/)** — Desktop app framework (Rust backend)
+- **[React 19](https://react.dev/)** — UI framework
+- **[Vite](https://vitejs.dev/)** — Build tool
+- **[Rust](https://www.rust-lang.org/)** — Timer engine & window management
 
 ## 📁 Project Structure
 
 ```
 focus-float/
-├── main.js              # Electron main process (2 windows)
-├── preload.js           # Secure IPC bridge
-├── src/
-│   ├── core/
-│   │   └── timer.js     # Timer engine (shared logic)
-│   ├── renderer/
-│   │   ├── index.html   # Full window
-│   │   ├── pip.html     # PiP floating window
-│   │   ├── style.css    # Shared styles
-│   │   ├── app.js       # Full window controller
-│   │   └── pip.js       # PiP window controller
-│   └── assets/
-│       └── icon.png
+├── src-tauri/             # Rust backend
+│   ├── src/
+│   │   └── main.rs        # Timer engine + IPC + windows
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+├── src/                   # React frontend
+│   ├── components/        # React components
+│   │   ├── TimerRing.jsx
+│   │   ├── FatigueBar.jsx
+│   │   ├── CycleDots.jsx
+│   │   ├── StatsRow.jsx
+│   │   └── SettingsPanel.jsx
+│   ├── App.jsx            # Main window
+│   ├── PipApp.jsx         # PiP window
+│   ├── styles.css
+│   └── main.jsx
+├── index.html             # Main entry
+├── pip.html               # PiP entry
+├── vite.config.js
 └── package.json
 ```
 

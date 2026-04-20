@@ -1,37 +1,24 @@
 {
   "name": "focus-float",
+  "private": true,
   "version": "1.0.0",
-  "description": "Enhanced Pomodoro timer with floating PiP window",
-  "main": "main.js",
+  "type": "module",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder",
-    "build:mac": "electron-builder --mac",
-    "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
   },
-  "keywords": ["pomodoro", "timer", "focus", "productivity", "pip"],
-  "author": "Daryl Andrian",
-  "license": "MIT",
+  "dependencies": {
+    "@tauri-apps/api": "^2.5.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
   "devDependencies": {
-    "electron": "^35.0.0",
-    "electron-builder": "^25.0.0"
-  },
-  "build": {
-    "appId": "com.darylandrian.focusfloat",
-    "productName": "FocusFloat",
-    "mac": {
-      "category": "public.app-category.productivity"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
-    },
-    "files": [
-      "**/*",
-      "!node_modules/.cache/**"
-    ]
+    "@tauri-apps/cli": "^2.5.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.5.0",
+    "vite": "^6.3.0"
   }
 }
