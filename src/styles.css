@@ -103,13 +103,44 @@ body {
   font-size: 15px;
   font-weight: 500;
   color: var(--c-text-dim);
-  margin-bottom: 6px;
+  margin-bottom: 16px;
+}
+
+.ring-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.ring-svg {
+  width: 200px;
+  height: 200px;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--c-border);
+  stroke-width: 4;
+}
+
+.ring-fill {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 565;
+  transition: stroke-dashoffset 1s linear, stroke 0.4s;
 }
 
 .phase-time {
-  font-size: 56px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
   font-weight: 300;
-  letter-spacing: -3px;
+  letter-spacing: -2px;
   font-variant-numeric: tabular-nums;
   color: var(--c-text);
 }

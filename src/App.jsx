@@ -52,7 +52,20 @@ export default function App() {
           <i className={timer.config.icon} style={{ marginRight: 6 }}></i>
           {timer.config.label}
         </div>
-        <div className="phase-time">{timer.timeDisplay}</div>
+        <div className="ring-wrapper">
+          <svg className="ring-svg" viewBox="0 0 200 200">
+            <circle className="ring-track" cx="100" cy="100" r="90" />
+            <circle
+              className="ring-fill"
+              cx="100" cy="100" r="90"
+              style={{
+                strokeDashoffset: 565 - (565 * timer.progress),
+                stroke: timer.config.color,
+              }}
+            />
+          </svg>
+          <div className="phase-time">{timer.timeDisplay}</div>
+        </div>
       </div>
 
       {/* Progress Bar */}
