@@ -1,14 +1,11 @@
-// ─── FocusFloat Backend (Rust + Tauri) ─────────────────────────
+// ─── FocusFloat Backend (Rust + Tauri v2) ─────────────────────
 // Timer engine, window management, system tray, IPC
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
-use tauri::{
-    image::Image, Manager, PhysicalSize, State, SystemTray, SystemTrayEvent, SystemTrayMenu,
-    SystemTrayMenuItem, WebviewWindowBuilder, WebviewWindow, WindowEvent,
-};
+use tauri::{Manager, State};
 use tokio::time::{interval, Duration};
 
 // ─── Timer Engine ──────────────────────────────────────────────
@@ -52,13 +49,13 @@ impl Phase {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Settings {
-    pub work_duration: u32,      // minutes
-    pub ai_duration: u32,        // minutes
-    pub base_rest_duration: u32, // minutes
-    pub rest_increment: u32,     // minutes per cycle
-    pub max_rest_duration: u32,  // minutes
+    pub work_duration: u32,
+    pub ai_duration: u32,
+    pub base_rest_duration: u32,
+    pub rest_increment: u32,
+    pub max_rest_duration: u32,
     pub long_break_duration: u32,
-    pub fatigue_threshold: u32,  // points
+    pub fatigue_threshold: u32,
     pub sound_enabled: bool,
     pub auto_start_next: bool,
 }
@@ -93,10 +90,10 @@ pub struct TimerState {
     pub phase_color: String,
     pub phase_sublabel: String,
     pub time_display: String,
-    pub progress: f64,          // 0.0 to 1.0
+    pub progress: f64,
     pub is_running: bool,
-    pub phase_elapsed: u32,     // seconds
-    pub phase_duration: u32,    // seconds
+    pub phase_elapsed: u32,
+    pub phase_duration: u32,
     pub fatigue: f64,
     pub fatigue_threshold: u32,
     pub fatigue_percent: f64,
@@ -124,7 +121,6 @@ pub struct TimerEngine {
     pub total_elapsed: u32,
 }
 
-// The cycle order: [Work, Rest, Work, Rest, AI, Rest]
 const CYCLE_ORDER: [Phase; 6] = [
     Phase::Work,
     Phase::Rest,
@@ -177,14 +173,11 @@ impl TimerEngine {
     }
 
     pub fn tick(&mut self) -> bool {
-        // Returns true if phase changed
         if !self.is_running {
             return false;
         }
-
         self.phase_elapsed += 1;
         self.total_elapsed += 1;
-
         if self.phase_elapsed >= self.phase_duration {
             self.complete_phase();
             true
@@ -196,7 +189,6 @@ impl TimerEngine {
     fn complete_phase(&mut self) {
         let completed_phase = self.phase.clone();
 
-        // Track fatigue
         match completed_phase {
             Phase::Work => {
                 self.fatigue += self.settings.work_duration as f64;
@@ -211,14 +203,12 @@ impl TimerEngine {
             _ => {}
         }
 
-        // Check for long break
         if self.should_long_break() && completed_phase != Phase::LongBreak {
             self.transition_to(Phase::LongBreak);
             self.sessions_completed.long_breaks += 1;
             return;
         }
 
-        // After long break, reset
         if completed_phase == Phase::LongBreak {
             self.fatigue = 0.0;
             self.cycle_count = 0;
@@ -227,7 +217,6 @@ impl TimerEngine {
             return;
         }
 
-        // Normal cycle progression
         self.phase_index += 1;
         if self.phase_index >= CYCLE_ORDER.len() {
             self.phase_index = 0;
@@ -379,7 +368,8 @@ fn hide_pip(app: tauri::AppHandle) {
 #[tauri::command]
 fn toggle_pip(app: tauri::AppHandle) -> bool {
     if let Some(win) = app.get_webview_window("pip") {
-        if win.is_visible().unwrap_or(false) {
+        let visible = win.is_visible().unwrap_or(false);
+        if visible {
             let _ = win.hide();
             false
         } else {
@@ -399,61 +389,15 @@ fn focus_main(app: tauri::AppHandle) {
     }
 }
 
-// ─── Notification ──────────────────────────────────────────────
-
-#[tauri::command]
-fn send_notification(app: tauri::AppHandle, title: String, body: String) {
-    tauri::notification::Builder::new(&app)
-        .title(&title)
-        .body(&body)
-        .show()
-        .unwrap_or(());
-}
-
 // ─── Main ──────────────────────────────────────────────────────
 
 fn main() {
     let settings = Settings::default();
     let timer_engine = TimerEngine::new(settings);
 
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(tauri::TrayMenuItem::with_id("show", "Show FocusFloat", true, None))
-        .add_item(tauri::TrayMenuItem::with_id("pip", "Toggle PiP", true, None))
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(tauri::TrayMenuItem::with_id("quit", "Quit", true, None));
-
-    let tray = SystemTray::new().with_menu(tray_menu);
-
     tauri::Builder::default()
         .manage(AppState {
             timer: Mutex::new(timer_engine),
-        })
-        .system_tray(tray)
-        .on_system_tray_event(|app, event| {
-            match event {
-                SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-                    "show" => {
-                        if let Some(win) = app.get_webview_window("main") {
-                            let _ = win.show();
-                            let _ = win.set_focus();
-                        }
-                    }
-                    "pip" => {
-                        let _ = toggle_pip(app.clone());
-                    }
-                    "quit" => {
-                        app.exit(0);
-                    }
-                    _ => {}
-                },
-                SystemTrayEvent::LeftClick { .. } => {
-                    if let Some(win) = app.get_webview_window("main") {
-                        let _ = win.show();
-                        let _ = win.set_focus();
-                    }
-                }
-                _ => {}
-            }
         })
         .setup(|app| {
             // Timer tick loop
@@ -466,29 +410,14 @@ fn main() {
                     let mut timer = state.timer.lock().unwrap();
                     let phase_changed = timer.tick();
                     let state_data = timer.get_state();
-                    drop(timer); // Release lock before emitting
+                    drop(timer);
 
-                    // Emit to all windows
                     let _ = app_handle.emit("timer-tick", &state_data);
                     if phase_changed {
                         let _ = app_handle.emit("phase-change", &state_data);
                     }
                 }
             });
-
-            // Setup PiP window
-            if let Some(pip_win) = app.get_webview_window("pip") {
-                let pip_win_clone = pip_win.clone();
-                pip_win.on_window_event(move |event| {
-                    if let WindowEvent::Focused(focused) = event {
-                        // Keep PiP always on top when focused
-                        if *focused {
-                            let _ = pip_win_clone.set_always_on_top(true);
-                        }
-                    }
-                });
-            }
-
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -502,7 +431,6 @@ fn main() {
             hide_pip,
             toggle_pip,
             focus_main,
-            send_notification,
         ])
         .run(tauri::generate_context!())
         .expect("error while running FocusFloat");
