@@ -1,0 +1,37 @@
+{
+  "name": "focus-float",
+  "version": "1.0.0",
+  "description": "Enhanced Pomodoro timer with floating PiP window",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
+  },
+  "keywords": ["pomodoro", "timer", "focus", "productivity", "pip"],
+  "author": "Daryl Andrian",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.darylandrian.focusfloat",
+    "productName": "FocusFloat",
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "files": [
+      "**/*",
+      "!node_modules/.cache/**"
+    ]
+  }
+}

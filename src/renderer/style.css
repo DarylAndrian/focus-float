@@ -1,0 +1,552 @@
+/* ─── FocusFloat Styles ─────────────────────────────────────── */
+/* Enhanced Pomodoro Timer with Floating PiP */
+
+:root {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-card: #0f3460;
+  --text-primary: #eaeaea;
+  --text-secondary: #a0a0b0;
+  --accent-red: #e94560;
+  --accent-blue: #0f3460;
+  --accent-teal: #16a085;
+  --accent-purple: #8e44ad;
+  --accent-green: #27ae60;
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ─── Full Window Layout ────────────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 24px;
+}
+
+/* ─── Title Bar ─────────────────────────────────────────────── */
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  -webkit-app-region: drag;
+}
+
+.title-bar h1 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.title-bar .controls {
+  display: flex;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.title-bar button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.title-bar button:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+}
+
+/* ─── Phase Indicator ───────────────────────────────────────── */
+.phase-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.phase-label {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  transition: var(--transition);
+}
+
+.phase-sublabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ─── Circular Timer ────────────────────────────────────────── */
+.timer-circle-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.timer-circle {
+  position: relative;
+  width: 220px;
+  height: 220px;
+}
+
+.timer-circle svg {
+  transform: rotate(-90deg);
+  width: 220px;
+  height: 220px;
+}
+
+.timer-circle .bg-ring {
+  fill: none;
+  stroke: rgba(255,255,255,0.05);
+  stroke-width: 8;
+}
+
+.timer-circle .progress-ring {
+  fill: none;
+  stroke: var(--accent-red);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 628;
+  stroke-dashoffset: 628;
+  transition: stroke-dashoffset 1s linear, stroke 0.5s ease;
+}
+
+.timer-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+}
+
+/* ─── Controls ──────────────────────────────────────────────── */
+.controls-section {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.btn {
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 28px;
+  transition: var(--transition);
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--accent-red);
+  color: white;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+}
+
+.btn-primary.running {
+  background: #c0392b;
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.15);
+  color: var(--text-primary);
+}
+
+.btn-pip {
+  background: var(--accent-purple);
+  color: white;
+}
+
+.btn-pip:hover {
+  filter: brightness(1.15);
+}
+
+/* ─── Fatigue Bar ───────────────────────────────────────────── */
+.fatigue-section {
+  margin: 16px 0;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+}
+
+.fatigue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.fatigue-bar {
+  height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fatigue-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-green), #f39c12, var(--accent-red));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ─── Stats Row ─────────────────────────────────────────────── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  display: block;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+  display: block;
+}
+
+/* ─── Cycle Progress ────────────────────────────────────────── */
+.cycle-section {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 14px 16px;
+  margin: 8px 0;
+}
+
+.cycle-header {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.cycle-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.cycle-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: var(--transition);
+}
+
+.cycle-dot.work {
+  background: rgba(233, 69, 96, 0.2);
+  border: 2px solid var(--accent-red);
+}
+
+.cycle-dot.rest {
+  background: rgba(15, 52, 96, 0.3);
+  border: 2px solid var(--accent-blue);
+}
+
+.cycle-dot.ai {
+  background: rgba(22, 160, 133, 0.2);
+  border: 2px solid var(--accent-teal);
+}
+
+.cycle-dot.active {
+  transform: scale(1.2);
+  box-shadow: 0 0 12px currentColor;
+}
+
+.cycle-dot.completed {
+  opacity: 0.5;
+}
+
+.cycle-arrow {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+/* ─── Settings Panel ────────────────────────────────────────── */
+.settings-panel {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  z-index: 100;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.settings-panel.open {
+  display: block;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.settings-header h2 {
+  font-size: 20px;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.setting-group {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 16px;
+}
+
+.setting-group h3 {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.setting-row label {
+  font-size: 14px;
+}
+
+.setting-row input[type="number"] {
+  width: 70px;
+  padding: 6px 10px;
+  background: var(--bg-primary);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 14px;
+  text-align: center;
+}
+
+.setting-row input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent-red);
+}
+
+.setting-row .unit {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-left: 6px;
+}
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 24px;
+  transition: var(--transition);
+}
+
+.toggle-slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.toggle input:checked + .toggle-slider {
+  background: var(--accent-red);
+}
+
+.toggle input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* ─── PiP Window Styles ─────────────────────────────────────── */
+body.pip {
+  background: transparent;
+  overflow: visible;
+}
+
+#pip-app {
+  background: rgba(26, 26, 46, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 16px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: grab;
+}
+
+#pip-app:active {
+  cursor: grabbing;
+}
+
+.pip-phase {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.pip-time {
+  font-size: 36px;
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.pip-progress-bar {
+  width: 120px;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.pip-progress-fill {
+  height: 100%;
+  background: var(--accent-red);
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+
+.pip-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.pip-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.pip-btn-play {
+  background: var(--accent-red);
+  color: white;
+}
+
+.pip-btn-expand {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+}
+
+.pip-btn:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+
+.pip-fatigue-mini {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
+}
