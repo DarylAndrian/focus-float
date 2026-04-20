@@ -24,7 +24,7 @@ export default function SettingsPanel({ settings, onSave, onClose }) {
   return (
     <div className="settings-panel open">
       <div className="settings-header">
-        <h2>⚙️ Settings</h2>
+        <h2><i className="fa-solid fa-sliders" style={{ marginRight: 8 }}></i>Settings</h2>
         <button className="btn btn-secondary" onClick={onClose}>✕ Close</button>
       </div>
 
@@ -67,7 +67,7 @@ export default function SettingsPanel({ settings, onSave, onClose }) {
       </div>
 
       <button className="btn btn-primary save-btn" onClick={handleSave}>
-        💾 Save & Close
+        <i className="fa-solid fa-floppy-disk" style={{ marginRight: 8 }}></i>Save & Close
       </button>
     </div>
   );
