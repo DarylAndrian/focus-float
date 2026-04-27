@@ -102,8 +102,10 @@ export default function useTimer() {
         setSessions(s => ({ ...s, longBreaks: s.longBreaks + 1 }));
         setForcedRestActive(true); // Force rest for long break
         playSound('long_break', settings.soundEnabled);
-        notify('Long break — press Start when ready!');
+        notify('Long break — timer starting!');
         triggerVisualAlert('long_break', settings.visualAlertEnabled);
+        // Auto-start long break
+        setTimeout(() => setIsRunning(true), 100);
         return;
       }
 
@@ -139,9 +141,11 @@ export default function useTimer() {
       notify(labels[nextPhase] + ' Press Start to begin.');
       triggerVisualAlert(nextPhase, settings.visualAlertEnabled);
       
-      // Activate forced rest overlay for rest phases
+      // Activate forced rest overlay for rest phases + auto-start timer
       if ((nextPhase === 'rest' || nextPhase === 'long_break') && settings.forcedRestEnabled) {
         setForcedRestActive(true);
+        // Auto-start rest timer so it doesn't get stuck
+        setTimeout(() => setIsRunning(true), 100);
       }
     }
   }, [phaseElapsed, phaseDuration, isRunning]);

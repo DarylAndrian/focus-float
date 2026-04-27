@@ -162,10 +162,27 @@ export default function App() {
       {/* Forced Rest Cat Overlay */}
       {timer.forcedRestActive && (
         <div className="forced-rest-overlay">
-          <div className="cat-container">
-            <div className="cat-emoji">🐱</div>
-            <h2>Rest Time!</h2>
-            <p>Look at this cat. Chill. Rest your eyes.</p>
+          <div className="stickman-fight-container">
+            <div className="fight-scene">
+              <div className="stickman stickman-1">
+                <div className="head"></div>
+                <div className="body"></div>
+                <div className="arm-left"></div>
+                <div className="arm-right"></div>
+                <div className="leg-left"></div>
+                <div className="leg-right"></div>
+              </div>
+              <div className="vs-text">VS</div>
+              <div className="stickman stickman-2">
+                <div className="head"></div>
+                <div className="body"></div>
+                <div className="arm-left"></div>
+                <div className="arm-right"></div>
+                <div className="leg-left"></div>
+                <div className="leg-right"></div>
+              </div>
+            </div>
+            <h2>Rest Time! Watch the Fight!</h2>
             <div className="rest-timer">{timer.timeDisplay}</div>
             <div className="rest-progress">
               <div 
