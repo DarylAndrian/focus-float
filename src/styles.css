@@ -531,6 +531,7 @@ body {
   justify-content: center;
   z-index: 99999;
   animation: restFadeIn 0.5s ease-out;
+  pointer-events: auto; /* Allow clicks on overlay */
 }
 
 @keyframes restFadeIn {

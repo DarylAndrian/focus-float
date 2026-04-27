@@ -36,18 +36,16 @@ export default function App() {
     document.title = `${timer.timeDisplay} — ${timer.config.label} | FocusFloat`;
   }, [timer.timeDisplay, timer.config.label]);
 
-  // Prevent interaction during forced rest
+  // Prevent interaction during forced rest (except emergency button)
   useEffect(() => {
     if (timer.forcedRestActive) {
       document.body.style.overflow = 'hidden';
-      document.body.style.pointerEvents = 'none';
+      // Don't disable pointer events globally - handle via overlay
     } else {
       document.body.style.overflow = '';
-      document.body.style.pointerEvents = '';
     }
     return () => {
       document.body.style.overflow = '';
-      document.body.style.pointerEvents = '';
     };
   }, [timer.forcedRestActive]);
 
