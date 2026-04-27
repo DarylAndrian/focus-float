@@ -1,18 +1,17 @@
 # 🍅 FocusFloat
 
-> Enhanced Pomodoro timer with floating PiP window — built with Rust + React
+> Enhanced Pomodoro timer with floating (PiP-like) timer — pure web app
 
 FocusFloat uses a smarter timeboxing model: **Work → Rest → Work → Rest → AI Handling → Rest** with progressive rest durations that increase as your fatigue accumulates. After a fatigue threshold is reached, a long break resets you for the next round.
 
 ## ✨ Features
 
-- 🦀 **Rust Backend** — Rock-solid timer engine, zero drift, ~8MB binary
-- ⚛️ **React Frontend** — Clean UI with smooth animations
-- 🔲 **Floating PiP Timer** — Always-on-top mini timer that stays visible over any app
+- ⚛️ **React (Vite) PWA** — Runs fully in the browser, installable
+- 🔲 **Floating Timer UI** — Stays visible and on-top within the browser
 - 🧠 **Progressive Rest** — Rest durations grow as fatigue accumulates
-- 🤖 **AI Handling Phase** — Dedicated semi-work phase (counts as 0.5x fatigue)
+- 🤖 **AI Handling Phase** — Dedicated semi-work phase (counts as 0.5× fatigue)
 - 😴 **Long Break Reset** — Automatic long break when fatigue threshold is reached
-- 🔔 **System Notifications** — Native OS notifications on phase changes
+- 🔔 **Web Notifications** — Browser notifications on phase changes (with permission)
 - ⚙️ **Customizable Settings** — All durations and thresholds are tunable
 
 ## 🔄 Cycle Flow
@@ -30,7 +29,7 @@ When fatigue ≥ 60 points → [Long Break 25m] → fatigue reset → repeat
 | Phase | Fatigue Points |
 |-------|---------------|
 | Work (25m) | +25 |
-| AI Handling (20m) | +10 (0.5x) |
+| AI Handling (20m) | +10 (0.5×) |
 | Rest | Recovery |
 
 ## 🚀 Getting Started
@@ -38,53 +37,40 @@ When fatigue ≥ 60 points → [Long Break 25m] → fatigue reset → repeat
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+
-- [Rust](https://rustup.rs/) (for Tauri backend)
-- OS dependencies for Tauri: https://v2.tauri.app/start/prerequisites/
 
-### Install & Run
+### Install & Run (dev)
 
 ```bash
-# Clone the repo
 git clone https://github.com/DarylAndrian/focus-float.git
 cd focus-float
-
-# Install frontend deps
 npm install
-
-# Run in dev mode
-npm run tauri dev
+npm run dev
 ```
 
-### Build
+Open http://localhost:5173
+
+### Build (production)
 
 ```bash
-npm run tauri build
+npm run build
 ```
 
-Output binary: `src-tauri/target/release/bundle/`
+Static output in `dist/` — deploy anywhere (GitHub Pages, Netlify, Vercel, etc.).
 
 ## ⌨️ Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| System tray | Show/Hide, Toggle PiP, Quit |
+- No global shortcuts in the web version; interactions are in-app.
 
 ## 🛠 Tech Stack
 
-- **[Tauri v2](https://v2.tauri.app/)** — Desktop app framework (Rust backend)
 - **[React 19](https://react.dev/)** — UI framework
-- **[Vite](https://vitejs.dev/)** — Build tool
-- **[Rust](https://www.rust-lang.org/)** — Timer engine & window management
+- **[Vite](https://vitejs.dev/)** — Build tool & dev server
+- Plain JS timer engine (no Rust/Tauri)
 
 ## 📁 Project Structure
 
 ```
 focus-float/
-├── src-tauri/             # Rust backend
-│   ├── src/
-│   │   └── main.rs        # Timer engine + IPC + windows
-│   ├── Cargo.toml
-│   └── tauri.conf.json
 ├── src/                   # React frontend
 │   ├── components/        # React components
 │   │   ├── TimerRing.jsx
@@ -92,14 +78,16 @@ focus-float/
 │   │   ├── CycleDots.jsx
 │   │   ├── StatsRow.jsx
 │   │   └── SettingsPanel.jsx
+│   ├── hooks/             # Timer & state logic
+│   │   └── useTimer.js
 │   ├── App.jsx            # Main window
-│   ├── PipApp.jsx         # PiP window
 │   ├── styles.css
 │   └── main.jsx
 ├── index.html             # Main entry
-├── pip.html               # PiP entry
+├── public/                # Static assets & PWA manifest
+├── package.json
 ├── vite.config.js
-└── package.json
+└── README.md
 ```
 
 ## 📝 License

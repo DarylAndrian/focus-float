@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import useTimer from './hooks/useTimer';
+import useTimer, { setVisualAlertCallback } from './hooks/useTimer';
 import SettingsPanel from './components/SettingsPanel';
 
 export default function App() {
   const timer = useTimer();
   const [showSettings, setShowSettings] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('focusfloat-theme') || 'light');
+  const [visualAlert, setVisualAlert] = useState(null);
+
+  // Register visual alert callback
+  useEffect(() => {
+    setVisualAlertCallback((phase) => {
+      setVisualAlert(phase);
+      setTimeout(() => setVisualAlert(null), 1500);
+    });
+  }, []);
 
   // Apply theme
   useEffect(() => {
@@ -133,6 +142,14 @@ export default function App() {
           onSave={timer.updateSettings}
           onClose={() => setShowSettings(false)}
         />
+      )}
+
+      {/* Visual Alert Flash */}
+      {visualAlert && (
+        <div className={`visual-alert visual-alert-${visualAlert}`}>
+          <i className={timer.config.icon}></i>
+          <span>{timer.config.label}</span>
+        </div>
       )}
     </div>
   );

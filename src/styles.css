@@ -468,3 +468,52 @@ body {
   #app { padding: 20px 16px; }
   .phase-time { font-size: 48px; }
 }
+
+/* ─── Visual Alert Flash ──────────────────────────────────── */
+.visual-alert {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-size: 24px;
+  font-weight: 600;
+  z-index: 9999;
+  pointer-events: none;
+  animation: flashFade 1.5s ease-out forwards;
+}
+
+.visual-alert i {
+  font-size: 48px;
+}
+
+.visual-alert-work {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.visual-alert-rest {
+  background: rgba(163, 118, 61, 0.15);
+  color: #a3763d;
+}
+
+.visual-alert-ai {
+  background: rgba(45, 212, 191, 0.15);
+  color: #2dd4bf;
+}
+
+.visual-alert-long_break {
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
+}
+
+@keyframes flashFade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}

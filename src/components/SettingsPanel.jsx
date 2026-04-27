@@ -15,6 +15,7 @@ export default function SettingsPanel({ settings, onSave, onClose }) {
       longBreakDuration: Math.max(5, Math.min(60, form.longBreakDuration)),
       fatigueThreshold: Math.max(20, Math.min(200, form.fatigueThreshold)),
       soundEnabled: form.soundEnabled,
+      visualAlertEnabled: form.visualAlertEnabled,
     };
     onSave(clean);
     onClose();
@@ -47,6 +48,12 @@ export default function SettingsPanel({ settings, onSave, onClose }) {
         <Row label="Sound">
           <label className="toggle">
             <input type="checkbox" checked={form.soundEnabled} onChange={e => update('soundEnabled', e.target.checked)} />
+            <span className="toggle-track"></span>
+          </label>
+        </Row>
+        <Row label="Visual Alert">
+          <label className="toggle">
+            <input type="checkbox" checked={form.visualAlertEnabled} onChange={e => update('visualAlertEnabled', e.target.checked)} />
             <span className="toggle-track"></span>
           </label>
         </Row>

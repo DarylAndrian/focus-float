@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS = {
   longBreakDuration: 25,
   fatigueThreshold: 60,
   soundEnabled: true,
+  visualAlertEnabled: true,
   autoStartNext: false,
 };
 
@@ -99,6 +100,7 @@ export default function useTimer() {
         setSessions(s => ({ ...s, longBreaks: s.longBreaks + 1 }));
         playSound('long_break', settings.soundEnabled);
         notify('Long break — press Start when ready!');
+        triggerVisualAlert('long_break', settings.visualAlertEnabled);
         return;
       }
 
@@ -111,6 +113,7 @@ export default function useTimer() {
         setPhaseElapsed(0);
         playSound('work', settings.soundEnabled);
         notify('Fresh start — press Start!');
+        triggerVisualAlert('work', settings.visualAlertEnabled);
         return;
       }
 
@@ -129,6 +132,7 @@ export default function useTimer() {
       const labels = { work: 'Time to focus!', rest: 'Rest time!', ai: 'AI handling!' };
       playSound(nextPhase, settings.soundEnabled);
       notify(labels[nextPhase] + ' Press Start to begin.');
+      triggerVisualAlert(nextPhase, settings.visualAlertEnabled);
     }
   }, [phaseElapsed, phaseDuration, isRunning]);
 
@@ -201,26 +205,34 @@ function playSound(phase, enabled) {
   if (!enabled) return;
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    const tones = {
-      work: [660, 880],
-      rest: [440, 550],
-      ai: [520, 660],
-      long_break: [330, 440],
+    
+    const phaseSounds = {
+      work: { freq: 880, duration: 0.8, type: 'square' },
+      rest: { freq: 440, duration: 1.0, type: 'sine' },
+      ai: { freq: 660, duration: 0.8, type: 'triangle' },
+      long_break: { freq: 330, duration: 1.5, type: 'sine' },
     };
-    const [f1, f2] = tones[phase] || [660, 880];
-
-    osc.frequency.setValueAtTime(f1, ctx.currentTime);
-    osc.frequency.setValueAtTime(f2, ctx.currentTime + 0.15);
-    osc.frequency.setValueAtTime(f1, ctx.currentTime + 0.3);
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.6);
+    
+    const sound = phaseSounds[phase] || phaseSounds.work;
+    
+    // Create a more noticeable pattern
+    const times = [0, 0.2, 0.4];
+    times.forEach((t, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.type = sound.type;
+      osc.frequency.setValueAtTime(sound.freq, ctx.currentTime + t);
+      osc.frequency.exponentialRampToValueAtTime(sound.freq * 1.2, ctx.currentTime + t + 0.1);
+      
+      gain.gain.setValueAtTime(0.2, ctx.currentTime + t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + sound.duration / times.length);
+      
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + sound.duration / times.length);
+    });
   } catch {}
 }
 
@@ -229,5 +241,20 @@ function notify(body) {
     new Notification('FocusFloat', { body });
   } else if (Notification.permission !== 'denied') {
     Notification.requestPermission();
+  }
+}
+
+// ─── Visual Alert (in-app flash) ────────────────────────────
+
+let visualAlertCallback = null;
+
+export function setVisualAlertCallback(cb) {
+  visualAlertCallback = cb;
+}
+
+function triggerVisualAlert(phase, enabled) {
+  if (!enabled) return;
+  if (visualAlertCallback) {
+    visualAlertCallback(phase);
   }
 }
