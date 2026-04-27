@@ -172,7 +172,7 @@ export default function App() {
                 <div className="leg-left"></div>
                 <div className="leg-right"></div>
               </div>
-              <div className="vs-text">VS</div>
+              <div className="vs-text">🎵</div>
               <div className="stickman stickman-2">
                 <div className="head"></div>
                 <div className="body"></div>
@@ -182,7 +182,7 @@ export default function App() {
                 <div className="leg-right"></div>
               </div>
             </div>
-            <h2>Rest Time! Watch the Fight!</h2>
+            <h2>Rest Time! Watch Them Dance! 💃</h2>
             <div className="rest-timer">{timer.timeDisplay}</div>
             <div className="rest-progress">
               <div 
@@ -191,6 +191,9 @@ export default function App() {
               ></div>
             </div>
             <p className="rest-hint">Timer running... overlay disappears when rest done.</p>
+            <button className="skip-emergency-btn" onClick={timer.skip}>
+              🚨 Emergency Skip
+            </button>
           </div>
         </div>
       )}

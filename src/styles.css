@@ -518,7 +518,7 @@ body {
   100% { opacity: 0; }
 }
 
-/* ─── Forced Rest Stickman Fight ─────────────────────── */
+/* ─── Forced Rest Stickman Dance ─────────────────────── */
 .forced-rest-overlay {
   position: fixed;
   top: 0;
@@ -558,7 +558,7 @@ body {
   position: relative;
   width: 60px;
   height: 150px;
-  animation: fightMove 1s ease-in-out infinite;
+  animation: danceMove 0.8s ease-in-out infinite;
 }
 
 .stickman-1 {
@@ -566,14 +566,14 @@ body {
 }
 
 .stickman-2 {
-  animation-delay: 0.5s;
+  animation-delay: 0.4s;
 }
 
-@keyframes fightMove {
+@keyframes danceMove {
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-20px) rotate(-5deg); }
-  50% { transform: translateY(0) rotate(5deg); }
-  75% { transform: translateY(-10px) rotate(-3deg); }
+  25% { transform: translateY(-25px) rotate(-10deg); }
+  50% { transform: translateY(0) rotate(10deg); }
+  75% { transform: translateY(-15px) rotate(-5deg); }
 }
 
 .stickman .head {
@@ -609,24 +609,24 @@ body {
 
 .stickman .arm-left {
   left: 50%;
-  transform: rotate(-45deg);
-  animation: armSwingLeft 0.5s ease-in-out infinite;
+  transform: rotate(-60deg);
+  animation: armWaveLeft 0.8s ease-in-out infinite;
 }
 
 .stickman .arm-right {
   left: 50%;
-  transform: rotate(45deg);
-  animation: armSwingRight 0.5s ease-in-out infinite;
+  transform: rotate(60deg);
+  animation: armWaveRight 0.8s ease-in-out infinite;
 }
 
-@keyframes armSwingLeft {
-  0%, 100% { transform: rotate(-45deg); }
-  50% { transform: rotate(-90deg); }
+@keyframes armWaveLeft {
+  0%, 100% { transform: rotate(-60deg); }
+  50% { transform: rotate(-120deg); }
 }
 
-@keyframes armSwingRight {
-  0%, 100% { transform: rotate(45deg); }
-  50% { transform: rotate(90deg); }
+@keyframes armWaveRight {
+  0%, 100% { transform: rotate(60deg); }
+  50% { transform: rotate(120deg); }
 }
 
 .stickman .leg-left,
@@ -641,37 +641,34 @@ body {
 
 .stickman .leg-left {
   left: 45%;
-  transform: rotate(-15deg);
-  animation: legSwingLeft 0.5s ease-in-out infinite;
+  transform: rotate(-20deg);
+  animation: legKickLeft 0.8s ease-in-out infinite;
 }
 
 .stickman .leg-right {
   left: 55%;
-  transform: rotate(15deg);
-  animation: legSwingRight 0.5s ease-in-out infinite;
+  transform: rotate(20deg);
+  animation: legKickRight 0.8s ease-in-out infinite;
 }
 
-@keyframes legSwingLeft {
-  0%, 100% { transform: rotate(-15deg); }
-  50% { transform: rotate(-30deg); }
+@keyframes legKickLeft {
+  0%, 100% { transform: rotate(-20deg); }
+  50% { transform: rotate(-45deg); }
 }
 
-@keyframes legSwingRight {
-  0%, 100% { transform: rotate(15deg); }
-  50% { transform: rotate(30deg); }
+@keyframes legKickRight {
+  0%, 100% { transform: rotate(20deg); }
+  50% { transform: rotate(45deg); }
 }
 
 .vs-text {
   font-size: 48px;
-  font-weight: 900;
-  color: #ef4444;
-  text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
-  animation: vsPulse 1s ease-in-out infinite;
+  animation: musicPulse 1s ease-in-out infinite;
 }
 
-@keyframes vsPulse {
+@keyframes musicPulse {
   0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 0.8; }
 }
 
 .stickman-fight-container h2 {
@@ -710,4 +707,30 @@ body {
   font-size: 16px;
   opacity: 0.7;
   font-style: italic;
+  margin-bottom: 20px;
+}
+
+.skip-emergency-btn {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font);
+  animation: emergencyPulse 2s ease-in-out infinite;
+}
+
+.skip-emergency-btn:hover {
+  background: rgba(239, 68, 68, 1);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+@keyframes emergencyPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
 }
