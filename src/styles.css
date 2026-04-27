@@ -517,3 +517,89 @@ body {
   70% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+/* ─── Forced Rest Cat Overlay ──────────────────────────── */
+.forced-rest-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  animation: restFadeIn 0.5s ease-out;
+}
+
+@keyframes restFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cat-container {
+  text-align: center;
+  color: white;
+  padding: 40px;
+  max-width: 500px;
+}
+
+.cat-emoji {
+  font-size: 120px;
+  animation: catBounce 2s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes catBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.cat-container h2 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.cat-container p {
+  font-size: 20px;
+  margin-bottom: 24px;
+  opacity: 0.9;
+}
+
+.rest-timer {
+  font-size: 72px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 24px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.rest-progress {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.rest-progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 4px;
+  transition: width 1s linear;
+}
+
+.rest-hint {
+  font-size: 16px;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Dark mode forced rest */
+[data-theme="dark"] .forced-rest-overlay {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}

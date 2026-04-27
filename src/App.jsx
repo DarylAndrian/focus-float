@@ -36,6 +36,21 @@ export default function App() {
     document.title = `${timer.timeDisplay} — ${timer.config.label} | FocusFloat`;
   }, [timer.timeDisplay, timer.config.label]);
 
+  // Prevent interaction during forced rest
+  useEffect(() => {
+    if (timer.forcedRestActive) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.pointerEvents = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.pointerEvents = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.pointerEvents = '';
+    };
+  }, [timer.forcedRestActive]);
+
   const total = timer.totalWorkMin + timer.totalAiMin;
   const hours = Math.floor(total / 60);
   const mins = total % 60;
@@ -142,6 +157,25 @@ export default function App() {
           onSave={timer.updateSettings}
           onClose={() => setShowSettings(false)}
         />
+      )}
+
+      {/* Forced Rest Cat Overlay */}
+      {timer.forcedRestActive && (
+        <div className="forced-rest-overlay">
+          <div className="cat-container">
+            <div className="cat-emoji">🐱</div>
+            <h2>Rest Time!</h2>
+            <p>Look at this cat. Chill. Rest your eyes.</p>
+            <div className="rest-timer">{timer.timeDisplay}</div>
+            <div className="rest-progress">
+              <div 
+                className="rest-progress-fill" 
+                style={{ width: `${timer.progress * 100}%` }}
+              ></div>
+            </div>
+            <p className="rest-hint">Timer running... overlay disappears when rest done.</p>
+          </div>
+        </div>
       )}
 
       {/* Visual Alert Flash */}

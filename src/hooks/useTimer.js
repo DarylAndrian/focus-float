@@ -19,6 +19,7 @@ const DEFAULT_SETTINGS = {
   fatigueThreshold: 60,
   soundEnabled: true,
   visualAlertEnabled: true,
+  forcedRestEnabled: true,
   autoStartNext: false,
 };
 
@@ -46,6 +47,7 @@ export default function useTimer() {
   const [totalAiMin, setTotalAiMin] = useState(0);
   const [phaseElapsed, setPhaseElapsed] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [forcedRestActive, setForcedRestActive] = useState(false);
 
   const intervalRef = useRef(null);
 
@@ -98,6 +100,7 @@ export default function useTimer() {
         setPhase('long_break');
         setPhaseElapsed(0);
         setSessions(s => ({ ...s, longBreaks: s.longBreaks + 1 }));
+        setForcedRestActive(true); // Force rest for long break
         playSound('long_break', settings.soundEnabled);
         notify('Long break — press Start when ready!');
         triggerVisualAlert('long_break', settings.visualAlertEnabled);
@@ -111,6 +114,7 @@ export default function useTimer() {
         setPhaseIndex(0);
         setPhase('work');
         setPhaseElapsed(0);
+        setForcedRestActive(false);
         playSound('work', settings.soundEnabled);
         notify('Fresh start — press Start!');
         triggerVisualAlert('work', settings.visualAlertEnabled);
@@ -128,17 +132,24 @@ export default function useTimer() {
       setPhaseIndex(nextIndex);
       setPhase(nextPhase);
       setPhaseElapsed(0);
+      setForcedRestActive(false); // Deactivate forced rest when phase changes
 
       const labels = { work: 'Time to focus!', rest: 'Rest time!', ai: 'AI handling!' };
       playSound(nextPhase, settings.soundEnabled);
       notify(labels[nextPhase] + ' Press Start to begin.');
       triggerVisualAlert(nextPhase, settings.visualAlertEnabled);
+      
+      // Activate forced rest overlay for rest phases
+      if ((nextPhase === 'rest' || nextPhase === 'long_break') && settings.forcedRestEnabled) {
+        setForcedRestActive(true);
+      }
     }
   }, [phaseElapsed, phaseDuration, isRunning]);
 
   const toggle = useCallback(() => setIsRunning(r => !r), []);
 
   const skip = useCallback(() => {
+    setForcedRestActive(false);
     setPhaseElapsed(phaseDuration);
   }, [phaseDuration]);
 
@@ -172,6 +183,7 @@ export default function useTimer() {
     timeDisplay,
     progress,
     isRunning,
+    forcedRestActive,
     toggle,
     skip,
     reset,

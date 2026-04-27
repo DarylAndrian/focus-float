@@ -16,6 +16,7 @@ export default function SettingsPanel({ settings, onSave, onClose }) {
       fatigueThreshold: Math.max(20, Math.min(200, form.fatigueThreshold)),
       soundEnabled: form.soundEnabled,
       visualAlertEnabled: form.visualAlertEnabled,
+      forcedRestEnabled: form.forcedRestEnabled,
     };
     onSave(clean);
     onClose();
@@ -54,6 +55,12 @@ export default function SettingsPanel({ settings, onSave, onClose }) {
         <Row label="Visual Alert">
           <label className="toggle">
             <input type="checkbox" checked={form.visualAlertEnabled} onChange={e => update('visualAlertEnabled', e.target.checked)} />
+            <span className="toggle-track"></span>
+          </label>
+        </Row>
+        <Row label="Forced Rest (Cat)">
+          <label className="toggle">
+            <input type="checkbox" checked={form.forcedRestEnabled} onChange={e => update('forcedRestEnabled', e.target.checked)} />
             <span className="toggle-track"></span>
           </label>
         </Row>
