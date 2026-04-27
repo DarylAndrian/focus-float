@@ -11,8 +11,11 @@ FocusFloat uses a smarter timeboxing model: **Work → Rest → Work → Rest �
 - 🧠 **Progressive Rest** — Rest durations grow as fatigue accumulates
 - 🤖 **AI Handling Phase** — Dedicated semi-work phase (counts as 0.5× fatigue)
 - 😴 **Long Break Reset** — Automatic long break when fatigue threshold is reached
-- 🔔 **Web Notifications** — Browser notifications on phase changes (with permission)
-- ⚙️ **Customizable Settings** — All durations and thresholds are tunable
+- 🔔 **Sound Notifications** — Distinct audio alerts per phase (Work/Rest/AI/Long Break)
+- 💃 **Visual Alerts** — Full-screen flash + dancing stickmen during rest
+- 🚨 **Forced Rest Mode** — Blocks UI during rest with dancing stickmen (emergency skip available)
+- 🎨 **Dark Mode** — Toggle light/dark theme
+- ⚙️ **Customizable Settings** — All durations, thresholds, and toggles tunable
 
 ## 🔄 Cycle Flow
 
@@ -31,6 +34,15 @@ When fatigue ≥ 60 points → [Long Break 25m] → fatigue reset → repeat
 | Work (25m) | +25 |
 | AI Handling (20m) | +10 (0.5×) |
 | Rest | Recovery |
+
+## 🆕 What's New
+
+### v1.1 — Sound + Visual Overhaul
+- **Sound notifications** — 3-tone beep patterns unique to each phase
+- **Visual alert flash** — Color-coded full-screen flash on phase change
+- **Forced Rest Mode** — Dancing stickmen appear during rest (can't skip unless emergency)
+- **Emergency Skip button** — Red pulsing button to bypass forced rest in urgent situations
+- **Settings toggles** — Enable/disable sound, visual alerts, and forced rest independently
 
 ## 🚀 Getting Started
 
@@ -65,6 +77,8 @@ Static output in `dist/` — deploy anywhere (GitHub Pages, Netlify, Vercel, etc
 
 - **[React 19](https://react.dev/)** — UI framework
 - **[Vite](https://vitejs.dev/)** — Build tool & dev server
+- **Web Audio API** — Sound notifications
+- **CSS Animations** — Dancing stickmen, visual alerts
 - Plain JS timer engine (no Rust/Tauri)
 
 ## 📁 Project Structure
@@ -80,8 +94,8 @@ focus-float/
 │   │   └── SettingsPanel.jsx
 │   ├── hooks/             # Timer & state logic
 │   │   └── useTimer.js
-│   ├── App.jsx            # Main window
-│   ├── styles.css
+│   ├── App.jsx            # Main window + forced rest overlay
+│   ├── styles.css         # All styles (including stickmen animations)
 │   └── main.jsx
 ├── index.html             # Main entry
 ├── public/                # Static assets & PWA manifest
