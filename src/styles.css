@@ -1,6 +1,7 @@
 /* ─── FocusFloat — Minimalist, 60-30-10 ─────────────────────── */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   /* ── Light Mode (default) ── */
@@ -9,13 +10,20 @@
   /* 10% */ --c-accent: #ef4444;
   --c-accent-hover: #dc2626;
   --c-accent-soft: rgba(239, 68, 68, 0.08);
+  --c-success: #22c55e;
+  --c-success-soft: rgba(34, 197, 94, 0.1);
   --c-text: #171717;
   --c-text-dim: #737373;
   --c-border: #e5e5e5;
   --c-border-hover: #d4d4d4;
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-focus: 0 0 0 3px rgba(239, 68, 68, 0.15);
   --font: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --touch-target: 44px;
 }
 
 [data-theme="dark"] {
@@ -24,15 +32,31 @@
   /* 10% */ --c-accent: #ef4444;
   --c-accent-hover: #f87171;
   --c-accent-soft: rgba(239, 68, 68, 0.12);
+  --c-success: #22c55e;
+  --c-success-soft: rgba(34, 197, 94, 0.15);
   --c-text: #fafafa;
   --c-text-dim: #737373;
   --c-border: #262626;
   --c-border-hover: #404040;
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
   --shadow-md: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-focus: 0 0 0 3px rgba(239, 68, 68, 0.25);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Smooth scrolling */
+* {
+  -webkit-tap-highlight-color: rgba(239, 68, 68, 0.2);
+  scroll-behavior: smooth;
+}
 
 body {
   font-family: var(--font);
@@ -77,20 +101,51 @@ body {
   background: none;
   border: 1px solid var(--c-border);
   color: var(--c-text-dim);
-  width: 34px;
-  height: 34px;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
   border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.icon-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--c-accent-soft);
+  opacity: 0;
+  transform: scale(0.8);
+  border-radius: 10px;
+  transition: all var(--transition-fast);
 }
 
 .icon-btn:hover {
   border-color: var(--c-border-hover);
   color: var(--c-text);
+  transform: translateY(-1px);
+}
+
+.icon-btn:hover::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+  transition: transform 50ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-btn:focus-visible {
+  box-shadow: var(--shadow-focus);
+  outline: none;
 }
 
 /* ─── Phase ─────────────────────────────────────────────────── */
@@ -130,7 +185,8 @@ body {
   stroke-width: 4;
   stroke-linecap: round;
   stroke-dasharray: 565;
-  transition: stroke-dashoffset 1s linear, stroke 0.4s;
+  transition: stroke-dashoffset 1s linear, stroke 0.4s var(--transition-normal);
+  filter: drop-shadow(0 0 8px var(--c-accent));
 }
 
 .phase-time {
@@ -138,11 +194,14 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
   font-size: 48px;
-  font-weight: 300;
+  font-weight: 500;
   letter-spacing: -2px;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on, 'zero' on;
   color: var(--c-text);
+  transition: color 0.4s var(--transition-normal);
 }
 
 /* ─── Progress Bar ──────────────────────────────────────────── */
@@ -159,7 +218,8 @@ body {
   height: 100%;
   background: var(--c-accent);
   border-radius: 2px;
-  transition: width 1s linear;
+  transition: width 1s linear, background 0.4s var(--transition-normal);
+  filter: drop-shadow(0 0 6px var(--c-accent));
 }
 
 /* ─── Action Buttons ────────────────────────────────────────── */
@@ -176,33 +236,80 @@ body {
   font-family: var(--font);
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.15s;
+  transition: all var(--transition-fast);
   outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  transform: scale(0.95);
+  border-radius: 12px;
+  transition: all 100ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
 .btn-primary {
   flex: 1;
   padding: 18px;
+  min-height: 56px;
   background: var(--c-accent);
   color: white;
   font-size: 16px;
   letter-spacing: 0.3px;
+  box-shadow: var(--shadow-sm), 0 0 20px rgba(239, 68, 68, 0.2);
 }
 
 .btn-primary:hover {
   background: var(--c-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), 0 0 25px rgba(239, 68, 68, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  transition: transform 75ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover::after {
+  opacity: 0.1;
+  transform: scale(1);
+}
+
+.btn-primary:focus-visible {
+  box-shadow: var(--shadow-focus), 0 0 20px rgba(239, 68, 68, 0.2);
+  outline: none;
 }
 
 .btn-secondary {
-  padding: 14px 20px;
+  padding: 18px 24px;
+  min-height: 56px;
   background: var(--c-card);
   border: 1px solid var(--c-border);
   color: var(--c-text-dim);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover {
   border-color: var(--c-border-hover);
   color: var(--c-text);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+  transition: transform 75ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:focus-visible {
+  box-shadow: var(--shadow-focus);
+  outline: none;
 }
 
 /* ─── Fatigue ───────────────────────────────────────────────── */
@@ -735,3 +842,222 @@ body {
   0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
   50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
 }
+
+/* ─── Focus Music Panel ──────────────────────────────────────── */
+.focus-music-panel {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 320px;
+  height: 100vh;
+  background: var(--c-card);
+  border-left: 1px solid var(--c-border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+}
+
+.focus-music-panel.open {
+  right: 0;
+}
+
+.focus-music-panel .music-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.focus-music-panel .music-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.focus-music-panel .sound-types {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 24px;
+}
+
+.sound-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px;
+  background: var(--c-bg);
+  border: 2px solid var(--c-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--c-text-dim);
+}
+
+.sound-type-btn i {
+  font-size: 24px;
+}
+
+.sound-type-btn span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sound-type-btn:hover {
+  border-color: var(--c-border-hover);
+  color: var(--c-text);
+  transform: translateY(-2px);
+  background: var(--c-card);
+}
+
+.sound-type-btn.active {
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+}
+
+.sound-type-btn:active {
+  transform: scale(0.97);
+  transition: transform 50ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.focus-music-panel .volume-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px 24px;
+}
+
+.volume-control i {
+  color: var(--c-text-dim);
+  font-size: 14px;
+}
+
+.volume-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--c-border);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--c-accent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.volume-slider::-webkit-slider-thumb:active {
+  transform: scale(1.1);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--c-accent);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: transform 100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.focus-music-panel .play-pause-btn {
+  margin: 0 24px 24px;
+  padding: 16px;
+  background: var(--c-accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm), 0 0 20px rgba(239, 68, 68, 0.2);
+  min-height: 56px;
+}
+
+.play-pause-btn:hover {
+  background: var(--c-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), 0 0 25px rgba(239, 68, 68, 0.3);
+}
+
+.play-pause-btn:active {
+  transform: scale(0.98);
+  transition: transform 75ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.play-pause-btn:focus-visible {
+  box-shadow: var(--shadow-focus), 0 0 20px rgba(239, 68, 68, 0.2);
+  outline: none;
+}
+
+/* ─── Focus Music Toggle Button ─────────────────────────────────── */
+.focus-music-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: var(--shadow-md), 0 0 20px rgba(239, 68, 68, 0.3);
+  transition: all var(--transition-fast);
+  z-index: 50;
+}
+
+.focus-music-toggle:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 30px rgba(239, 68, 68, 0.4);
+}
+
+.focus-music-toggle:active {
+  transform: scale(0.95);
+  transition: transform 75ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.focus-music-toggle.playing {
+  animation: musicPulse 2s ease-in-out infinite;
+}
+
+.focus-music-toggle:focus-visible {
+  box-shadow: var(--shadow-focus), 0 0 20px rgba(239, 68, 68, 0.3);
+  outline: none;
+}
+
+@keyframes musicPulse {
+  0%, 100% { box-shadow: var(--shadow-md), 0 0 20px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: var(--shadow-md), 0 0 30px rgba(239, 68, 68, 0.5); }
+}
+

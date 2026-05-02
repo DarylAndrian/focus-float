@@ -8,6 +8,8 @@ FocusFloat uses a smarter timeboxing model: **Work → Rest → Work → Rest �
 
 - ⚛️ **React (Vite) PWA** — Runs fully in the browser, installable
 - 🔲 **Floating Timer UI** — Stays visible and on-top within the browser
+- ⌨️ **Keyboard Shortcuts** — Full keyboard control (Space, S, R, T, M, Escape)
+- 🎹 **Focus Music** — 5 ambient sounds (Rain, Forest, Café, White/Pink Noise)
 - 🧠 **Progressive Rest** — Rest durations grow as fatigue accumulates
 - 🤖 **AI Handling Phase** — Dedicated semi-work phase (counts as 0.5× fatigue)
 - 😴 **Long Break Reset** — Automatic long break when fatigue threshold is reached
@@ -16,6 +18,8 @@ FocusFloat uses a smarter timeboxing model: **Work → Rest → Work → Rest �
 - 🚨 **Forced Rest Mode** — Blocks UI during rest with dancing stickmen (emergency skip available)
 - 🎨 **Dark Mode** — Toggle light/dark theme
 - ⚙️ **Customizable Settings** — All durations, thresholds, and toggles tunable
+- ♿ **Accessible Design** — WCAG AA/AAA compliance, full keyboard navigation
+- 📱 **Mobile Optimized** — Touch-friendly interface (44x44px touch targets)
 
 ## 🔄 Cycle Flow
 
@@ -71,7 +75,34 @@ Static output in `dist/` — deploy anywhere (GitHub Pages, Netlify, Vercel, etc
 
 ## ⌨️ Keyboard Shortcuts
 
-- No global shortcuts in the web version; interactions are in-app.
+| Shortcut | Action |
+|----------|--------|
+| `Space` | Toggle timer (start/pause) |
+| `S` | Skip to next phase |
+| `R` | Reset timer and stats |
+| `T` | Toggle theme (light/dark) |
+| `M` | Toggle focus music panel |
+| `Escape` | Close settings/music panel or dismiss overlay |
+
+## 🎹 Focus Music
+
+Click the music button (bottom-right) or press `M` to open the focus music panel.
+
+**Available Sounds:**
+- 🌧️ **Rain** - Gentle rainfall
+- 🌲 **Forest** - Nature ambience with birds
+- ☕ **Café** - Ambient conversation
+- 📊 **White Noise** - Pure white noise
+- 🌊 **Pink Noise** - Softer, deeper
+
+**Controls:**
+- Play/Pause toggle
+- Volume slider (0-100%)
+- Switch between sound types
+- Music continues when panel is closed
+- Pulsing button indicates playing
+
+Sounds are generated in real-time using Web Audio API — no external files needed!
 
 ## 🛠 Tech Stack
 

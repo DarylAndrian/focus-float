@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import useTimer, { setVisualAlertCallback } from './hooks/useTimer';
+import useFocusMusic from './hooks/useFocusMusic';
 import SettingsPanel from './components/SettingsPanel';
+import FocusMusicPanel from './components/FocusMusicPanel';
 
 export default function App() {
   const timer = useTimer();
+  const music = useFocusMusic();
   const [showSettings, setShowSettings] = useState(false);
+  const [showMusic, setShowMusic] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('focusfloat-theme') || 'light');
   const [visualAlert, setVisualAlert] = useState(null);
 
@@ -30,6 +34,80 @@ export default function App() {
       Notification.requestPermission();
     }
   }, []);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't trigger shortcuts if user is typing in input fields
+      if (
+        e.target.tagName === 'INPUT' ||
+        e.target.tagName === 'TEXTAREA' ||
+        document.activeElement?.tagName === 'INPUT' ||
+        document.activeElement?.tagName === 'TEXTAREA'
+      ) {
+        return;
+      }
+
+      switch(e.code) {
+        case 'Space':
+          if (!showSettings && !showMusic) {
+            e.preventDefault();
+            timer.toggle();
+          }
+          break;
+        case 'KeyS':
+          if (!showSettings && !showMusic) {
+            e.preventDefault();
+            timer.skip();
+          }
+          break;
+        case 'KeyR':
+          if (!showSettings && !showMusic) {
+            e.preventDefault();
+            timer.reset();
+          }
+          break;
+        case 'KeyT':
+          if (!showSettings && !showMusic) {
+            e.preventDefault();
+            toggleTheme();
+          }
+          break;
+        case 'KeyM':
+          e.preventDefault();
+          setShowMusic(prev => !prev);
+          break;
+        case 'Escape':
+          e.preventDefault();
+          if (showSettings) {
+            setShowSettings(false);
+          } else if (showMusic) {
+            setShowMusic(false);
+          } else if (timer.forcedRestActive) {
+            // Allow escape to dismiss forced rest overlay (but don't skip)
+            setForcedRestActive(false);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Store shortcut handlers for accessibility
+    window.focusFloatShortcuts = {
+      'Space': 'Toggle timer',
+      'S': 'Skip phase',
+      'R': 'Reset timer',
+      'T': 'Toggle theme',
+      'M': 'Toggle music panel',
+      'Escape': 'Close settings / dismiss overlay'
+    };
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      delete window.focusFloatShortcuts;
+    };
+  }, [timer, showSettings, showMusic, toggleTheme]);
 
   // Tab title countdown
   useEffect(() => {
@@ -57,9 +135,14 @@ export default function App() {
     <div id="app">
       {/* Top Bar */}
       <div className="top-bar">
-        <span className="logo">FocusFloat</span>
+        <div>
+          <span className="logo">FocusFloat</span>
+          <span className="shortcuts-hint" title="Keyboard shortcuts available">
+            <i className="fa-solid fa-keyboard" style={{ marginLeft: 8, fontSize: 11, color: 'var(--c-text-dim)' }}></i>
+          </span>
+        </div>
         <div className="actions">
-          <button className="icon-btn" onClick={toggleTheme} title="Toggle theme">
+          <button className="icon-btn" onClick={toggleTheme} title="Toggle theme (T)">
             <i className={`fa-solid ${theme === 'light' ? 'fa-moon' : 'fa-sun'}`}></i>
           </button>
           <button className="icon-btn" onClick={() => setShowSettings(true)} title="Settings">
@@ -203,6 +286,30 @@ export default function App() {
           <span>{timer.config.label}</span>
         </div>
       )}
+
+      {/* Focus Music Panel */}
+      {showMusic && (
+        <FocusMusicPanel
+          sounds={music.sounds}
+          isPlaying={music.isPlaying}
+          currentSound={music.currentSound}
+          volume={music.volume}
+          onToggle={music.toggle}
+          onChangeSound={music.changeSound}
+          onChangeVolume={music.changeVolume}
+          onClose={() => setShowMusic(false)}
+        />
+      )}
+
+      {/* Focus Music Toggle */}
+      <button
+        className={`focus-music-toggle ${music.isPlaying ? 'playing' : ''}`}
+        onClick={() => setShowMusic(!showMusic)}
+        title="Focus Music (M)"
+        aria-label="Toggle focus music panel"
+      >
+        <i className="fa-solid fa-music"></i>
+      </button>
     </div>
   );
 }
