@@ -198,22 +198,31 @@ export default function App() {
 
       {/* Stats */}
       <div className="stats">
-        <div className="stat">
-          <span className="stat-num">{timer.sessions.work}</span>
-          <span className="stat-text">Work</span>
-        </div>
-        <div className="stat">
-          <span className="stat-num">{timer.sessions.ai}</span>
-          <span className="stat-text">AI</span>
-        </div>
-        <div className="stat">
-          <span className="stat-num">{timer.sessions.longBreaks}</span>
-          <span className="stat-text">Resets</span>
-        </div>
-        <div className="stat">
-          <span className="stat-num">{hours > 0 ? `${hours}h${mins > 0 ? mins + 'm' : ''}` : `${mins}m`}</span>
-          <span className="stat-text">Total</span>
-        </div>
+        {timer.sessions.work === 0 && timer.sessions.ai === 0 && total === 0 ? (
+          <div className="stats-empty">
+            <i className="fa-solid fa-rocket" style={{ fontSize: '24px', color: 'var(--c-accent)', marginBottom: '8px' }}></i>
+            <p style={{ fontSize: '13px', color: 'var(--c-text-dim)' }}>Ready to focus? Start your first session!</p>
+          </div>
+        ) : (
+          <>
+            <div className="stat">
+              <span className="stat-num">{timer.sessions.work}</span>
+              <span className="stat-text">Work</span>
+            </div>
+            <div className="stat">
+              <span className="stat-num">{timer.sessions.ai}</span>
+              <span className="stat-text">AI</span>
+            </div>
+            <div className="stat">
+              <span className="stat-num">{timer.sessions.longBreaks}</span>
+              <span className="stat-text">Resets</span>
+            </div>
+            <div className="stat">
+              <span className="stat-num">{hours > 0 ? `${hours}h${mins > 0 ? mins + 'm' : ''}` : `${mins}m`}</span>
+              <span className="stat-text">Total</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Cycle */}

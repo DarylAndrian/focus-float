@@ -376,6 +376,26 @@ body {
   display: block;
 }
 
+/* Empty state for first-time users */
+.stats-empty {
+  grid-column: 1 / -1;
+  background: var(--c-card);
+  border: 2px dashed var(--c-border);
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-normal);
+}
+
+.stats-empty:hover {
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft);
+}
+
 /* ─── Cycle ─────────────────────────────────────────────────── */
 .cycle-wrap {
   background: var(--c-card);
